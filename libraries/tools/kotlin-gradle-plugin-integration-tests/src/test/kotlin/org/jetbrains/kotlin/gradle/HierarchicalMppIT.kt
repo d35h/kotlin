@@ -5,11 +5,12 @@
 
 package org.jetbrains.kotlin.gradle
 
+import org.jetbrains.kotlin.gradle.internals.MULTIPLATFORM_PROJECT_METADATA_FILE_NAME
 import org.jetbrains.kotlin.gradle.internals.parseKotlinSourceSetMetadataFromXml
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinProjectStructureMetadata
-import org.jetbrains.kotlin.gradle.plugin.mpp.MULTIPLATFORM_PROJECT_METADATA_FILE_NAME
+import org.jetbrains.kotlin.gradle.plugin.mpp.ModuleDependencyIdentifier
 import org.jetbrains.kotlin.gradle.util.modify
-import org.jetbrains.kotlin.konan.file.File
+import java.io.File
 import java.util.zip.ZipFile
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.test.Test
@@ -297,7 +298,11 @@ class HierarchicalMppIT : BaseGradleIT() {
                 "linuxAndJsMain" to setOf("commonMain"),
                 "commonMain" to emptySet()
             ),
-            sourceSetModuleDependencies = sourceSetModuleDependencies
+            sourceSetModuleDependencies = sourceSetModuleDependencies.mapValues { (_, pairs) ->
+                pairs.map {
+                    ModuleDependencyIdentifier(it.first, it.second)
+                }.toSet()
+            }
         )
     }
 
